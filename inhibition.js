@@ -34,7 +34,7 @@ let showDownloadButton = false;
 
 function setup() {
   createCanvas(800, 600);
-  textAlign(CENTER, TOP);
+  textAlign(LEFT, TOP);
   textWrap(WORD);
   textLeading(30);
   frameRate(60);
@@ -106,6 +106,87 @@ function startSet() {
   ellipseShouldBeBlue = false;
 }
 
+function draw() {
+  background(0);
+  fill(255);
+  let elapsed = (millis() - trialStartTime) / 1000;
+
+  if (state === 'intro') {
+    drawIntro();
+  } else if (state === 'break') {
+    drawBreakScreen();
+  } else if (state === 'ISI') {
+    if (elapsed >= isiDuration) {
+      state = 'fixation';
+      trialStartTime = millis();
+    }
+  } else if (state === 'fixation') {
+    drawEllipse('white');
+    drawFixation();
+    if (elapsed >= fixationDuration) {
+      state = 'stimulus';
+      trialStartTime = millis();
+    }
+  } else if (state === 'stimulus') {
+    let t = elapsed;
+
+    let direction = currentTrial.direction;
+    let arrowDir = direction;
+    let arrowDisplayPos;
+
+    if (currentTrial.type === 'incongruent_go') {
+      arrowDir = direction === 'left' ? 'right' : 'left';
+      arrowDisplayPos = arrowPos[arrowDir];
+    } else {
+      arrowDisplayPos = arrowPos[direction];
+    }
+
+    if (currentTrial.type === 'nogo') {
+      ellipseShouldBeBlue = true;
+    } else if (currentTrial.type === 'stop' && !stopPresented && t >= ssd) {
+      ellipseShouldBeBlue = true;
+      stopPresented = true;
+    }
+
+    drawEllipse(ellipseShouldBeBlue ? 'blue' : 'white');
+    drawFixation();
+    drawArrow(arrowSymbol[arrowDir], arrowDisplayPos);
+
+    if (t >= stimulusDuration && !responded) {
+      handleResponse();
+      state = 'interTrial';
+      trialStartTime = millis();
+    }
+
+  } else if (state === 'interTrial') {
+    if (elapsed >= 0.5) {
+      setTrialIndex++;
+      if (setTrialIndex >= trialsPerSet) {
+        if (currentSet < totalSets) {
+          state = 'break';
+        } else {
+          state = 'end';
+          showDownloadButton = true;
+        }
+      } else {
+        currentTrial = trialList[setTrialIndex];
+        isiDuration = max(0.2, randomGaussian(1.5, 0.372));
+        state = 'ISI';
+        trialStartTime = millis();
+        responded = false;
+        stopPresented = false;
+        ellipseShouldBeBlue = false;
+      }
+    }
+  } else if (state === 'end') {
+    drawEndScreen();
+  }
+
+  if (showDownloadButton) {
+    drawDownloadButton();
+  }
+}
+
 function drawIntro() {
   background(0);
   textSize(18);
@@ -144,33 +225,32 @@ Drücken Sie eine beliebige Taste, um zu beginnen.`;
   text(instructionsBottom, margin, y, wrap);
 }
 
-
 function drawBreakScreen() {
   background(0);
   textSize(18);
-  textAlign(CENTER, CENTER);
+  textAlign(LEFT, TOP);
   textWrap(WORD);
-
+  const margin = 50;
+  const wrap = width - 2 * margin;
   const textLines = `Kurze Pause.
 
 Sie haben ${currentSet} von ${totalSets} Blöcken abgeschlossen.
 
 Drücken Sie eine beliebige Taste, um fortzufahren.`;
-
-  text(textLines, width / 2, height / 2, width - 100);
+  text(textLines, margin, 150, wrap);
 }
 
 function drawEndScreen() {
   background(0);
   textSize(18);
-  textAlign(CENTER, CENTER);
+  textAlign(LEFT, TOP);
   textWrap(WORD);
-
+  const margin = 50;
+  const wrap = width - 2 * margin;
   const textLines = `Vielen Dank für Ihre Teilnahme!
 
 Sie können nun Ihre Daten herunterladen.`;
-
-  text(textLines, width / 2, height / 2 - 40, width - 100);
+  text(textLines, margin, 150, wrap);
 }
 
 function drawDownloadButton() {
@@ -259,3 +339,4 @@ function shuffle(array) {
   }
   return array;
 }
+
