@@ -30,8 +30,6 @@ const fixationDuration = 0.5;
 const stimulusDuration = 1.0;
 let ellipseShouldBeBlue = false;
 
-let showDownloadButton = false;
-
 function setup() {
   createCanvas(800, 600);
   textAlign(LEFT, TOP);
@@ -91,7 +89,7 @@ function startSet() {
   currentSet++;
   if (currentSet > totalSets) {
     state = 'end';
-    showDownloadButton = true;
+    downloadCSV(); // trigger automatic download
     return;
   }
 
@@ -163,7 +161,6 @@ function draw() {
           state = 'break';
         } else {
           state = 'end';
-          showDownloadButton = true;
         }
       } else {
         currentTrial = trialList[setTrialIndex];
@@ -177,10 +174,6 @@ function draw() {
     }
   } else if (state === 'end') {
     drawEndScreen();
-  }
-
-  if (showDownloadButton) {
-    drawDownloadButton();
   }
 }
 
@@ -246,27 +239,8 @@ function drawEndScreen() {
   const wrap = width - 2 * margin;
   const textLines = `Vielen Dank für Ihre Teilnahme!
 
-Sie können das Fenster nun schließen`;
+Sie können das Fenster nun schließen.`;
   text(textLines, margin, 150, wrap);
-}
-
-function drawDownloadButton() {
-  let x = width / 2 - 100;
-  let y = height / 2 + 20;
-  let w = 200;
-  let h = 50;
-
-  fill(100);
-  rect(x, y, w, h, 10);
-  fill(255);
-  textSize(20);
-  textAlign(CENTER, CENTER);
-  text("Daten herunterladen", width / 2, y + h / 2);
-
-  if (mouseIsPressed && mouseX > x && mouseX < x + w && mouseY > y && mouseY < y + h) {
-    downloadCSV();
-    showDownloadButton = false;
-  }
 }
 
 function drawFixation() {
