@@ -106,94 +106,13 @@ function startSet() {
   ellipseShouldBeBlue = false;
 }
 
-function draw() {
-  background(0);
-  fill(255);
-  let elapsed = (millis() - trialStartTime) / 1000;
-
-  if (state === 'intro') {
-    drawIntro();
-  } else if (state === 'break') {
-    drawBreakScreen();
-  } else if (state === 'ISI') {
-    if (elapsed >= isiDuration) {
-      state = 'fixation';
-      trialStartTime = millis();
-    }
-  } else if (state === 'fixation') {
-    drawEllipse('white');
-    drawFixation();
-    if (elapsed >= fixationDuration) {
-      state = 'stimulus';
-      trialStartTime = millis();
-    }
-  } else if (state === 'stimulus') {
-    let t = elapsed;
-
-    let direction = currentTrial.direction;
-    let arrowDir = direction;
-    let arrowDisplayPos;
-
-    if (currentTrial.type === 'incongruent_go') {
-      arrowDir = direction === 'left' ? 'right' : 'left';
-      arrowDisplayPos = arrowPos[arrowDir];
-    } else {
-      arrowDisplayPos = arrowPos[direction];
-    }
-
-    if (currentTrial.type === 'nogo') {
-      ellipseShouldBeBlue = true;
-    } else if (currentTrial.type === 'stop' && !stopPresented && t >= ssd) {
-      ellipseShouldBeBlue = true;
-      stopPresented = true;
-    }
-
-    drawEllipse(ellipseShouldBeBlue ? 'blue' : 'white');
-    drawFixation();
-    drawArrow(arrowSymbol[arrowDir], arrowDisplayPos);
-
-    if (t >= stimulusDuration && !responded) {
-      handleResponse();
-      state = 'interTrial';
-      trialStartTime = millis();
-    }
-
-  } else if (state === 'interTrial') {
-    if (elapsed >= 0.5) {
-      setTrialIndex++;
-      if (setTrialIndex >= trialsPerSet) {
-        if (currentSet < totalSets) {
-          state = 'break';
-        } else {
-          state = 'end';
-          showDownloadButton = true;
-        }
-      } else {
-        currentTrial = trialList[setTrialIndex];
-        isiDuration = max(0.2, randomGaussian(1.5, 0.372));
-        state = 'ISI';
-        trialStartTime = millis();
-        responded = false;
-        stopPresented = false;
-        ellipseShouldBeBlue = false;
-      }
-    }
-  } else if (state === 'end') {
-    drawEndScreen();
-  }
-
-  if (showDownloadButton) {
-    drawDownloadButton();
-  }
-}
-
 function drawIntro() {
   background(0);
   textSize(18);
-  textAlign(CENTER, TOP);
+  textAlign(LEFT, TOP);
   textWrap(WORD);
 
-  const linesTop = `Willkommen zur Studie!
+  const instructionsTop = `Willkommen zur Studie!
 
 Bitte lesen Sie die folgenden Instruktionen sorgfältig:
 
@@ -202,26 +121,29 @@ Bitte lesen Sie die folgenden Instruktionen sorgfältig:
 → Bitte drücken Sie die Pfeiltaste, in die der Pfeil zeigt – so schnell und genau wie möglich.
 
 → Wenn der Rahmen (Ellipse)`;
-  const wordBlau = "BLAU";
-  const linesBottom = `wird, dürfen Sie NICHT reagieren.
+  const blauText = "BLAU";
+  const instructionsBottom = `wird, dürfen Sie NICHT reagieren.
 
 → Pausen sind nach jedem Block vorgesehen.
 
 Drücken Sie eine beliebige Taste, um zu beginnen.`;
 
-  const x = width / 2;
+  const margin = 50;
+  const wrap = width - 2 * margin;
   let y = 40;
-  const wrap = width - 100;
 
   fill(255);
-  text(linesTop, x, y, wrap);
+  text(instructionsTop, margin, y, wrap);
   y += 230;
+
   fill(0, 0, 255);
-  text(wordBlau, x, y, wrap);
+  text(blauText, margin, y, wrap);
   y += 30;
+
   fill(255);
-  text(linesBottom, x, y, wrap);
+  text(instructionsBottom, margin, y, wrap);
 }
+
 
 function drawBreakScreen() {
   background(0);
