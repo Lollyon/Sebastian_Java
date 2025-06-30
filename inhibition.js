@@ -10,7 +10,7 @@ const ssdStep = 0.050;
 const minSSD = 0.020;
 const maxSSD = 0.900;
 
-const trialsPerSet = 160;
+const trialsPerSet = 80;
 const totalSets = 3;
 
 let currentSet = 0;
