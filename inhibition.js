@@ -39,6 +39,8 @@ function setup() {
   textSize(40);
   fill(255);
   textLeading(50);
+
+  state = 'intro'; // show intro screen on launch
 }
 
 function keyPressed() {
@@ -47,7 +49,7 @@ function keyPressed() {
   } else if (state === 'break') {
     startSet();
   } else if (state === 'end') {
-    // do nothing
+    // Do nothing
   } else if (state === 'stimulus' && !responded) {
     responded = true;
     handleResponse();
@@ -90,11 +92,14 @@ function startSet() {
   currentSet++;
   if (currentSet > totalSets) {
     state = 'end';
+    showDownloadButton = true;
     return;
   }
 
   trialList = generateTrials();
   setTrialIndex = 0;
+  currentTrial = trialList[setTrialIndex];
+  isiDuration = max(0.2, randomGaussian(1.5, 0.372));
   state = 'ISI';
   trialStartTime = millis();
   responded = false;
@@ -125,7 +130,7 @@ function draw() {
     }
   } else if (state === 'stimulus') {
     let t = elapsed;
-    currentTrial = trialList[setTrialIndex];
+
     let direction = currentTrial.direction;
     let arrowDir = direction;
     let arrowDisplayPos;
@@ -174,7 +179,6 @@ function draw() {
         ellipseShouldBeBlue = false;
       }
     }
-
   } else if (state === 'end') {
     drawEndScreen();
   }
@@ -305,4 +309,3 @@ function shuffle(array) {
   }
   return array;
 }
-
