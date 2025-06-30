@@ -20,7 +20,7 @@ let fullData = [];
 
 let trialList = [];
 
-let state = 'intro'; // intro, break, ISI, fixation, stimulus, interTrial, end
+let state = 'intro';
 let trialStartTime = 0;
 let responded = false;
 let stopPresented = false;
@@ -34,13 +34,12 @@ let showDownloadButton = false;
 
 function setup() {
   createCanvas(800, 600);
-  textAlign(CENTER, CENTER);
+  textAlign(CENTER, TOP);
+  textWrap(WORD);
+  textLeading(30);
   frameRate(60);
-  textSize(40);
   fill(255);
-  textLeading(50);
-
-  state = 'intro'; // show intro screen on launch
+  state = 'intro';
 }
 
 function keyPressed() {
@@ -189,8 +188,12 @@ function draw() {
 }
 
 function drawIntro() {
-  textSize(24);
-  text(`Willkommen zur Studie!
+  background(0);
+  textSize(18);
+  textAlign(CENTER, TOP);
+  textWrap(WORD);
+
+  const linesTop = `Willkommen zur Studie!
 
 Bitte lesen Sie die folgenden Instruktionen sorgfältig:
 
@@ -198,27 +201,54 @@ Bitte lesen Sie die folgenden Instruktionen sorgfältig:
 
 → Bitte drücken Sie die Pfeiltaste, in die der Pfeil zeigt – so schnell und genau wie möglich.
 
-→ Wenn der Rahmen (Ellipse) BLAU wird, dürfen Sie NICHT reagieren.
+→ Wenn der Rahmen (Ellipse)`;
+  const wordBlau = "BLAU";
+  const linesBottom = `wird, dürfen Sie NICHT reagieren.
 
 → Pausen sind nach jedem Block vorgesehen.
 
-Drücken Sie eine beliebige Taste, um zu beginnen.`, width / 2, height / 2);
+Drücken Sie eine beliebige Taste, um zu beginnen.`;
+
+  const x = width / 2;
+  let y = 40;
+  const wrap = width - 100;
+
+  fill(255);
+  text(linesTop, x, y, wrap);
+  y += 230;
+  fill(0, 0, 255);
+  text(wordBlau, x, y, wrap);
+  y += 30;
+  fill(255);
+  text(linesBottom, x, y, wrap);
 }
 
 function drawBreakScreen() {
-  textSize(26);
-  text(`Kurze Pause.
+  background(0);
+  textSize(18);
+  textAlign(CENTER, CENTER);
+  textWrap(WORD);
+
+  const textLines = `Kurze Pause.
 
 Sie haben ${currentSet} von ${totalSets} Blöcken abgeschlossen.
 
-Drücken Sie eine beliebige Taste, um fortzufahren.`, width / 2, height / 2);
+Drücken Sie eine beliebige Taste, um fortzufahren.`;
+
+  text(textLines, width / 2, height / 2, width - 100);
 }
 
 function drawEndScreen() {
-  textSize(26);
-  text(`Vielen Dank für Ihre Teilnahme!
+  background(0);
+  textSize(18);
+  textAlign(CENTER, CENTER);
+  textWrap(WORD);
 
-Sie können nun Ihre Daten herunterladen.`, width / 2, height / 2 - 40);
+  const textLines = `Vielen Dank für Ihre Teilnahme!
+
+Sie können nun Ihre Daten herunterladen.`;
+
+  text(textLines, width / 2, height / 2 - 40, width - 100);
 }
 
 function drawDownloadButton() {
@@ -281,7 +311,6 @@ function handleResponse() {
   });
 }
 
-// CSV Download
 function downloadCSV() {
   let csv = "Set;Trial;Type;Direction;Responded;EllipseColor\n";
   fullData.forEach(d => {
@@ -297,7 +326,6 @@ function downloadCSV() {
   URL.revokeObjectURL(url);
 }
 
-// Fisher-Yates Shuffle
 function shuffle(array) {
   let currentIndex = array.length, temp, randomIndex;
   while (currentIndex !== 0) {
