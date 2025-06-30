@@ -1,6 +1,6 @@
 let fixationText = '+';
 let arrowSymbol = { left: '←', right: '→' };
-let arrowPos = { left: [-80, -4], right: [80, -4] };
+let arrowPos = { left: [-80, 0], right: [80, 0] };
 
 let ellipseW = 400;
 let ellipseH = 200;
