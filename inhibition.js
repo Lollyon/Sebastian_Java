@@ -1,6 +1,6 @@
 let fixationText = '+';
 let arrowSymbol = { left: '←', right: '→' };
-let arrowPos = { left: [-80, 0], right: [80, 0] };
+let arrowOffset = 100; // horizontal distance from center
 
 let ellipseW = 400;
 let ellipseH = 200;
@@ -132,14 +132,12 @@ function draw() {
 
     let direction = currentTrial.direction;
     let arrowDir = direction;
-    let arrowDisplayPos;
+    let arrowDisplayOffset = arrowOffset;
 
     if (currentTrial.type === 'incongruent_go') {
       arrowDir = direction === 'left' ? 'right' : 'left';
-      arrowDisplayPos = arrowPos[arrowDir];
-    } else {
-      arrowDisplayPos = arrowPos[direction];
     }
+    arrowDisplayOffset *= (arrowDir === 'left' ? -1 : 1);
 
     if (currentTrial.type === 'nogo') {
       ellipseShouldBeBlue = true;
@@ -150,14 +148,13 @@ function draw() {
 
     drawEllipse(ellipseShouldBeBlue ? 'blue' : 'white');
     drawFixation();
-    drawArrow(arrowSymbol[arrowDir], arrowDisplayPos);
+    drawArrow(arrowSymbol[arrowDir], arrowDisplayOffset);
 
     if (t >= stimulusDuration && !responded) {
       handleResponse();
       state = 'interTrial';
       trialStartTime = millis();
     }
-
   } else if (state === 'interTrial') {
     if (elapsed >= 0.5) {
       setTrialIndex++;
@@ -249,7 +246,7 @@ function drawEndScreen() {
   const wrap = width - 2 * margin;
   const textLines = `Vielen Dank für Ihre Teilnahme!
 
-Sie können nun Ihre Daten herunterladen.`;
+Sie können das Fenster nun schließen`;
   text(textLines, margin, 150, wrap);
 }
 
@@ -263,6 +260,7 @@ function drawDownloadButton() {
   rect(x, y, w, h, 10);
   fill(255);
   textSize(20);
+  textAlign(CENTER, CENTER);
   text("Daten herunterladen", width / 2, y + h / 2);
 
   if (mouseIsPressed && mouseX > x && mouseX < x + w && mouseY > y && mouseY < y + h) {
@@ -275,6 +273,7 @@ function drawFixation() {
   textSize(40);
   fill(255);
   noStroke();
+  textAlign(CENTER, CENTER);
   text(fixationText, width / 2, height / 2);
 }
 
@@ -285,11 +284,12 @@ function drawEllipse(colorName) {
   ellipse(width / 2, height / 2, ellipseW, ellipseH);
 }
 
-function drawArrow(symbol, pos) {
+function drawArrow(symbol, xOffset) {
   textSize(60);
   fill(255);
   noStroke();
-  text(symbol, width / 2 + pos[0], height / 2 + pos[1]);
+  textAlign(CENTER, CENTER);
+  text(symbol, width / 2 + xOffset, height / 2);
 }
 
 function handleResponse() {
@@ -339,4 +339,3 @@ function shuffle(array) {
   }
   return array;
 }
-
